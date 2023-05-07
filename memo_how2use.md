@@ -1,0 +1,87 @@
+- WSL環境構築
+    - wslインストール（それはそう）
+    - 対象のpythonをインストール
+        - [https://qiita.com/murakami77/items/b612734ff209cbb22afb](https://qiita.com/murakami77/items/b612734ff209cbb22afb)
+    - Cudaのインストール
+        - [https://developer.nvidia.com/cuda-11.1.0-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Debian&target_version=10&target_type=deblocal](https://developer.nvidia.com/cuda-11.1.0-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Debian&target_version=10&target_type=deblocal)
+    - Pytorch1.10インストール
+        - [https://pytorch.org/get-started/previous-versions/](https://pytorch.org/get-started/previous-versions/)
+        - typing-extensionsがそのままでは入れられないので、別途インスト―ルする
+            - pip install typing-extensions
+        - Pillowも
+            - [https://bobbyhadz.com/blog/python-pip-install-failed-building-wheel-for#failed-building-wheel-for-pillow-error-in-python](https://bobbyhadz.com/blog/python-pip-install-failed-building-wheel-for#failed-building-wheel-for-pillow-error-in-python)
+            - 場合によってはwheelも?
+                - pip install wheel
+    - opencv-pythonインストール
+        - pip install opencv-python
+    - tqdmインストール
+    - imageioインストール
+    - pypngインストール
+    - pytzインストール
+    - scipyインストール
+    - imgaugインストール
+    - progressiveXインストール
+        - [https://github.com/danini/progressive-x](https://github.com/danini/progressive-x)
+        - 事前にcmakeインストールしておく
+            - sudo apt install cmake
+        - Eigen3インストール
+            - [https://qiita.com/nishiys/items/1585d26a824862eec36b](https://qiita.com/nishiys/items/1585d26a824862eec36b)
+        - gflagsインストール
+            - [https://github.com/gflags/gflags/blob/master/INSTALL.md](https://github.com/gflags/gflags/blob/master/INSTALL.md)
+        - glogインストール
+            - [https://github.com/google/glog#cmake](https://github.com/google/glog#cmake)
+            - CMAKEで使えるようにソースからビルドする
+                - ビルドでcmakeのバージョンが足りないのでアップグレード
+                    - [https://self-development.info/【ubuntu】最新バージョンcmakeのインストール/](https://self-development.info/%E3%80%90ubuntu%E3%80%91%E6%9C%80%E6%96%B0%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3cmake%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB/)
+        - OpenCVインストール
+            - [https://stackoverflow.com/questions/8711109/could-not-find-module-findopencv-cmake-error-in-configuration-process](https://stackoverflow.com/questions/8711109/could-not-find-module-findopencv-cmake-error-in-configuration-process)
+    - 各種データ準備
+        - BOPデータセットの手配
+            - [https://bop.felk.cvut.cz/datasets/](https://bop.felk.cvut.cz/datasets/)
+            - 展開したらフォルダ名をlm→lmoにしておく
+        - configのパス変更
+            - bop_pathをlmデータセットがあるパスに変更
+        - ZebraPoseデータのダウンロード
+            - [https://cloud.dfki.de/owncloud/index.php/s/zT7z7c3e666mJTW?path=%2Flmo](https://cloud.dfki.de/owncloud/index.php/s/zT7z7c3e666mJTW?path=%2Flmo)
+        - efficientnet_keyを仕込む
+        - 学習済みのチェックポイントを仕込む
+        - 学習済みネットワークの読み込み方を修正する
+            - [https://jsapachehtml.hatenablog.com/entry/2019/03/02/185035](https://jsapachehtml.hatenablog.com/entry/2019/03/02/185035)
+            - これあんまり効果なかった
+        - EfficientNetのキーを設定
+            - efficientnet_key= b4
+        - ネットワークのサイズが合わねえや
+            - efficientnetだとサイズが合わない。
+            - efficientnetを使用しないようにコードを修正
+        - use_ipc必須なところを無視するようにコードを改修
+        - 動作確認OK！
+    - 性能確認
+        - pandasをインストール
+        - CSVを生成
+            - [https://github.com/suyz526/ZebraPose#evaluate-for-bop-challange](https://github.com/suyz526/ZebraPose#evaluate-for-bop-challange)
+        - BOP_TOOLKITで可視化データを生成
+            - [https://github.com/thodan/bop_toolkit](https://github.com/thodan/bop_toolkit)
+            - Cythonを個別インストール
+                - pip install cython
+            - config.pyは以下を変更
+                - datasets_path：lmoデータセットのlmoフォルダが置かれているパス
+                - results_path：csvの置かれているフォルダ
+                - eval_path：結果を格納するフォルダ
+            - WSLでvispyを使えない
+                - WSLgでGUIを有効化する
+                    - [https://learn.microsoft.com/ja-jp/windows/wsl/tutorials/gui-apps](https://learn.microsoft.com/ja-jp/windows/wsl/tutorials/gui-apps)
+                    - WSLを最新にする必要があるっぽい
+                        - wsl —updateできなければwsl —statusを確認してアップデータでカーネルをアップデートする
+                        - よくわからんがアップデータによるアップデートはダメだった。再起動したらうまく再インストールできました
+                        - [https://qiita.com/y-tsutsu/items/6bc65c0ce4d20a82a417](https://qiita.com/y-tsutsu/items/6bc65c0ce4d20a82a417)
+        - BOP_TOOLKITで可視化GUI呼び出し
+            - vis_est_poses.pyを使うっぽいが…データをうまく準備できていないのが問題
+            - ドキュメントに目を通そう
+            - vis_est_poses.pyのresult_filenamesに推定結果のcsvを指定
+            - renderer_vispy.pyの402行目でnormalsを使用しないように修正
+            - config.pyでoutput_pathに出力したいパスを指定
+    - 学習
+        - tensorboardインストール
+            - pip install tensorboard
+        - efficientnet_keyが存在しない場合にNonieにするようtrain.pyを修正
+        - check_point_pathとtensorboard_pathを修正
