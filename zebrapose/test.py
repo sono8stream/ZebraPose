@@ -33,6 +33,8 @@ from binary_code_helper.generate_new_dict import generate_new_corres_dict
 
 from tools_for_BOP import write_to_cvs 
 
+from collections import OrderedDict
+
 def VOCap(rec, prec):
     idx = np.where(rec != np.inf)
     if len(idx[0]) == 0:
@@ -91,7 +93,9 @@ def main(configs):
     resnet_layer = configs['resnet_layer']                              # usually resnet 34
     concat=configs['concat_encoder_decoder']   
     if 'efficientnet_key' in configs.keys():
-        efficientnet_key = configs['efficientnet_key']                
+        efficientnet_key = configs['efficientnet_key']   
+    else:
+        efficientnet_key = None             
 
     #### augmentations
     Detection_reaults=configs['Detection_reaults']                       # for the test, the detected bounding box provided by GDR Net
@@ -209,7 +213,12 @@ def main(configs):
         net=net.cuda()
 
     checkpoint = torch.load( configs['checkpoint_file'] )
-    net.load_state_dict(checkpoint['model_state_dict'])
+    # state_dict=OrderedDict()
+    # for k,v in checkpoint['model_state_dict'].items():
+    #     if k.startswith('module.'):
+    #         k=k[7:]
+    #     state_dict[k]=v
+    net.load_state_dict(checkpoint['model_state_dict'], strict=False)
 
     net.eval()
 
@@ -279,7 +288,7 @@ def main(configs):
                                                                             Bbox, BoundingBox_CropSize_GT, divide_number_each_itration, dict_class_id_3D_points, 
                                                                             intrinsic_matrix=cam_K)
         
-            if success:     
+            if success and configs['use_icp']:     
                 # add icp refinement and replace R_predict, t_predict
                 depth_image = read_depth(test_depth_files[obj_id][batch_idx])
                 if dataset_name == 'ycbv' or dataset_name == 'tless':
@@ -297,8 +306,10 @@ def main(configs):
                 R_[0,0] = 1
                 R_[1,1] = 1
                 R_[2,2] = 1
-                estimated_Rs.append(R_)
-                estimated_Ts.append(np.zeros((3,1)))
+                estimated_Rs.append(R_predict)
+                estimated_Ts.append(t_predict.reshape((3,1)))
+                #estimated_Rs.append(R_)
+                #estimated_Ts.append(np.zeros((3,1)))
 
             adx_error = 10000
             if success and has_gt:

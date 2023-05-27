@@ -54,6 +54,7 @@
             - efficientnetだとサイズが合わない。
             - efficientnetを使用しないようにコードを修正
         - use_ipc必須なところを無視するようにコードを改修
+        - test.pyの309,310行目で推定値をcsvに書き出すよう修正
         - 動作確認OK！
     - 性能確認
         - pandasをインストール
@@ -85,3 +86,6 @@
             - pip install tensorboard
         - efficientnet_keyが存在しない場合にNonieにするようtrain.pyを修正
         - check_point_pathとtensorboard_pathを修正
+        - 学習に必要なデータをダウンロード
+        - 実行
+        - もしGPUメモリが枯渇する場合はバッチサイズを変える

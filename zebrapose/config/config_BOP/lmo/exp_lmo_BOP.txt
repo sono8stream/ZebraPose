@@ -1,7 +1,7 @@
 #### training dataset
 ##for lmo, bop_challange = False during the training
 bop_challange = True
-bop_path = /home/ysu/data/data_object_pose/Remote_BOP/
+bop_path = /home/sono8/python/data/bop/
 dataset_name = lmo
 training_data_folder = train_pbr
 training_data_folder_2 = none
@@ -32,15 +32,15 @@ concat_encoder_decoder = True
 
 #### check points
 load_checkpoint=False
-check_point_path=/home/ysu/data/6dof_pose_experiments/experiments/checkpoints/
-tensorboard_path=/home/ysu/data/6dof_pose_experiments/experiments/tensorboard_logs/runs/
+check_point_path=/home/sono8/data/6dof_pose_experiments/experiments/checkpoints/
+tensorboard_path=/home/sono8/data/6dof_pose_experiments/experiments/tensorboard_logs/runs/
 ####
 
 
 #### optimizer
 optimizer_type = Adam
 learning_rate = 0.0002
-batch_size = 32
+batch_size = 16
 total_iteration = 380000
 
 binary_loss_weight = 3
@@ -48,7 +48,8 @@ binary_loss_weight = 3
 
 
 #### augmentations
-Detection_reaults = detection_results/lmo/fcos_V57eSE_MSx1333_ColorAugAAEWeaker_8e_lmo_pbr.json
+Detection_reaults = none
+#detection_results/lmo/fcos_V57eSE_MSx1333_ColorAugAAEWeaker_8e_lmo_pbr.json
 
 padding_ratio = 1.5
 resize_method = crop_square_resize
@@ -59,3 +60,6 @@ use_motion_blur= True
 #binary coding settings
 divide_number_each_itration = 2
 number_of_itration = 16
+
+# adds
+#efficientnet_key= b4
