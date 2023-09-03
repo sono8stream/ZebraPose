@@ -73,6 +73,11 @@ def main():
         reader=csv.reader(f)
         inferred=[row for row in reader]
 
+    json_path="/root/python/OpenCV/data/lmo_test_all/test/000002/scene_gt.json"
+    json_data=None
+    with open(json_path) as f:
+        json_data=json.load(f)
+
     for row in tqdm(inferred):
         image_id = row[1]
         if image_id=="im_id":
@@ -98,6 +103,30 @@ def main():
         print(translations)
         print(translations[0].shape)
 
+        id_key=image_id.lstrip("0")
+        gt=0
+        for current in json_data[id_key]:
+            if current["obj_id"] == 1:
+                gt = current
+                break
+        gt_rotations=np.array(gt["cam_R_m2c"]).reshape((1,3,3))
+        gt_translations=np.array(gt["cam_t_m2c"]).reshape((1,3,1))
+        print(gt_rotations)
+        print(gt_translations)
+
+        draw_detections(original_image,
+                        None,# 2Dのバウンディングボックスは描画しないので割り当てなくていいはず
+                        scores,
+                        labels,
+                        gt_rotations,
+                        gt_translations,
+                        class_to_bbox_3D = class_to_3d_bboxes,
+                        camera_matrix = camera_matrix,
+                        color = [0   , 240 , 100],
+                        label_to_name = class_to_name,
+                        draw_bbox_2d = draw_bbox_2d,
+                        draw_name = draw_name)
+
         draw_detections(original_image,
                         None,# 2Dのバウンディングボックスは描画しないので割り当てなくていいはず
                         scores,
@@ -106,6 +135,8 @@ def main():
                         translations,
                         class_to_bbox_3D = class_to_3d_bboxes,
                         camera_matrix = camera_matrix,
+                        color = [255 , 95  , 0],
+                        front_color = [15  , 0   , 255],
                         label_to_name = class_to_name,
                         draw_bbox_2d = draw_bbox_2d,
                         draw_name = draw_name)
