@@ -29,17 +29,20 @@ import os
 from tqdm import tqdm
 import math
 import csv
+import json
 
 from utils.visualization import draw_detections
 
 
 def main():
-    #input parameter
-    path_to_images = "/home/sono8/python/data/bop/lmo/test/000002/rgb"
+    #パラメータ群
+    dataset_name = "only_prediction"
+    path_to_dataset = "/home/sono8/python/data/mine/"+dataset_name+"/"
+    path_to_images = path_to_dataset+"test/000000/rgb"
     image_extension = ".png"
+    inferred_file_path="/home/sono8/python/zebraPose/ZebraPose/zebrapose/path/to/save/the/evaluation/report/pose_result_bop/only_prediction_ape.csv"
     phi = 0
-    save_path = "./predictions/occlusion/" #where to save the images or None if the images should be displayed and not saved
-    # save_path = None
+    save_path = "./predictions/"+dataset_name+"/" #where to save the images or None if the images should be displayed and not saved
 
     # 検出したいクラスを選ぶ
     class_to_name = {0: "ape"} #Linemod use a single class with a name of the Linemod objects
@@ -48,7 +51,7 @@ def main():
     draw_bbox_2d = False
     draw_name = False
     #for the linemod and occlusion trained models take this camera matrix and these 3d models. in case you trained a model on a custom dataset you need to take the camera matrix and 3d cuboids from your custom dataset.
-    camera_matrix = get_linemod_camera_matrix()
+    camera_matrix = get_linemod_camera_matrix(path_to_dataset)
     name_to_3d_bboxes = get_linemod_3d_bboxes()
     class_to_3d_bboxes = {class_idx: name_to_3d_bboxes[name] for class_idx, name in class_to_name.items()} 
     
@@ -65,7 +68,6 @@ def main():
     #model, image_size = build_model_and_load_weights(phi, num_classes, score_threshold, path_to_weights)
 
     # 既に推論済みのものを可視化
-    inferred_file_path="/home/sono8/python/zebraPose/ZebraPose/zebrapose/path/to/save/the/evaluation/report/pose_result_bop/lmo_ape.csv"
     inferred=[]
     with open(inferred_file_path) as f:
         reader=csv.reader(f)
@@ -128,13 +130,24 @@ def allow_gpu_growth_memory():
     _ = tf.Session(config = config)
 
 
-def get_linemod_camera_matrix():
+def get_linemod_camera_matrix(path_to_dataset):
     """
     Returns:
         The Linemod and Occlusion 3x3 camera matrix
 
     """
-    return np.array([[572.4114, 0., 325.2611], [0., 573.57043, 242.04899], [0., 0., 1.]], dtype = np.float32)
+    path_to_camera_params=path_to_dataset+"camera.json"
+
+    if not os.path.exists(path_to_camera_params):
+        # デフォルト値を返す
+        return np.array([[572.4114, 0., 325.2611], [0., 573.57043, 242.04899], [0., 0., 1.]], dtype = np.float32)
+
+    with open(path_to_camera_params, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    arr=np.array([[data['fx'], 0., data['cx']], [0., data['fx'], data['cy']], [0., 0., 1.]], dtype = np.float32)
+    print(arr)
+    return arr
 
 
 def get_linemod_3d_bboxes():
