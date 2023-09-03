@@ -41,6 +41,7 @@ def main():
     path_to_images = path_to_dataset+"test/000000/rgb"
     image_extension = ".png"
     inferred_file_path="/home/sono8/python/zebraPose/ZebraPose/zebrapose/path/to/save/the/evaluation/report/pose_result_bop/only_prediction_ape.csv"
+    gt_path=path_to_dataset+"test/000000/scene_gt.json"
     phi = 0
     save_path = "./predictions/"+dataset_name+"/" #where to save the images or None if the images should be displayed and not saved
 
@@ -73,9 +74,8 @@ def main():
         reader=csv.reader(f)
         inferred=[row for row in reader]
 
-    json_path="/root/python/OpenCV/data/lmo_test_all/test/000002/scene_gt.json"
     json_data=None
-    with open(json_path) as f:
+    with open(gt_path) as f:
         json_data=json.load(f)
 
     for row in tqdm(inferred):
@@ -104,6 +104,9 @@ def main():
         print(translations[0].shape)
 
         id_key=image_id.lstrip("0")
+        if id_key=="":
+            id_key="0"
+
         gt=0
         for current in json_data[id_key]:
             if current["obj_id"] == 1:
